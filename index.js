@@ -100,7 +100,9 @@ module.exports = {
 				identities: ["role/aws_key"]
 			});
 		} else {
-			if (id && id.identity) {
+			if (id && id.authorizer && id.authorizer.claims && id.authorizer.claims.sub) {
+				id = process.env.AWS_REGION + ':' + id.authorizer.claims.sub;
+			} else if (id && id.identity) {
 				id = id.identity.cognitoIdentityId || '*';
 			}
 
