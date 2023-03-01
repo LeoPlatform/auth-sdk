@@ -17,7 +17,7 @@
     "netmask": "^1.0.6"
   },
   "devDependencies": {
-    "mocha": "^3.5.3"
+    "mocha": "^10.2.0"
   },
   "author": "LEO Enterprises <dev@leoplatform.io> (http://leoplatform.io)",
   "repository": "LeoPlatform/auth-sdk",
