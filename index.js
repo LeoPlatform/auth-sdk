@@ -79,10 +79,45 @@ function createRequest(event, resource) {
 };
 
 
+function getPassedContext(event, body) {
+	body = body || event.body || {};
+	if (typeof body === 'string') {
+		try {
+			body = JSON.parse(body) || {};
+		} catch (e) {
+			body = {};
+		}
+	}
+	const context = Object.entries(event.queryStringParameters || {}).reduce(
+		(ctx, [key, value]) => {
+			let k;
+			if ((k = key.match(/^ctx[_-](.*)$/))) {
+				ctx[k[1]] = value;
+			}
+			return ctx;
+		},
+		body._context || {}
+	);
+	//delete body._context;
+	return context;
+}
+
 module.exports = {
 	getUser: async function(id) {
+		let origId = id;
 		if (id && id.requestContext) {
 			id = id.requestContext;
+		}
+		let passedContext = {};
+
+		// Admin caller. Check for proxy cognitoIdentityId
+		if (id && id.identity && !id.identity.cognitoIdentityId && id.identity.caller) {
+			passedContext = getPassedContext(origId);
+			if (passedContext.cognitoIdentityId) {
+				id.identity.cognitoIdentityId = passedContext.cognitoIdentityId;
+				//delete id.identity.caller;
+				//delete passedContext.cognitoIdentityId
+			}
 		}
 
 		if (!id) {
@@ -94,9 +129,9 @@ module.exports = {
 		} else if (id && id.identity && !id.identity.cognitoIdentityId && id.identity.caller) {
 			return wrapUser({
 				identity_id: "aws_key",
-				context: {
+				context: Object.assign(passedContext, {
 					key: id.identity.caller
-				},
+				}),
 				identities: ["role/aws_key"]
 			});
 		} else {
@@ -130,7 +165,7 @@ module.exports = {
 			}
 			return user.authorize(event, resource);
 		} else {
-			return this.getUser(event.requestContext).then(user => user.authorize(event, resource));
+			return this.getUser(event).then(user => user.authorize(event, resource));
 		}
 	},
 	bootstrap: function(config) {
