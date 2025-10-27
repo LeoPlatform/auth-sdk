@@ -219,6 +219,11 @@ function createRequest(event, resource) {
 };
 
 
+const typeConverters = {
+	number: (value) => parseFloat(value),
+	int: (value) => parseInt(value, 10)
+}
+
 function getPassedContext(event, body) {
 	body = body || event.body || {};
 	if (typeof body === 'string') {
@@ -232,6 +237,17 @@ function getPassedContext(event, body) {
 		(ctx, [key, value]) => {
 			let k;
 			if ((k = key.match(/^ctx[_-](.*)$/))) {
+
+				// Check for any type conversions on the query parameter
+				let type = event.queryStringParameters["t_" + key];
+				let converter = typeConverters[type];
+				if (converter) {
+					if (Array.isArray(value)) {
+						value = value.map(v => converter(v));
+					} else {
+						value = converter(v);
+					}
+				}
 				ctx[k[1]] = value;
 			}
 			return ctx;
@@ -243,6 +259,8 @@ function getPassedContext(event, body) {
 }
 
 module.exports = {
+	typeConverters,
+	getPassedContext,
 	configuration: {
 		LeoAuth: AUTH_TABLE,
 		LeoAuthUser: USER_TABLE
