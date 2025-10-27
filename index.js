@@ -221,7 +221,8 @@ function createRequest(event, resource) {
 
 const typeConverters = {
 	number: (value) => parseFloat(value),
-	int: (value) => parseInt(value, 10)
+	int: (value) => parseInt(value, 10),
+	boolean: (value) => value === 'true' || value === '1',
 }
 
 function getPassedContext(event, body) {
@@ -242,11 +243,7 @@ function getPassedContext(event, body) {
 				let type = event.queryStringParameters["t_" + key];
 				let converter = typeConverters[type];
 				if (converter) {
-					if (Array.isArray(value)) {
-						value = value.map(v => converter(v));
-					} else {
-						value = converter(v);
-					}
+					value = converter(value);					
 				}
 				ctx[k[1]] = value;
 			}
@@ -254,6 +251,22 @@ function getPassedContext(event, body) {
 		},
 		body._context || {}
 	);
+
+	// Multi value query parameters support (arrays) this is the default for HTTP requests to the API Gateway
+	if(event.multiValueQueryStringParameters) { 
+		Object.entries(event.multiValueQueryStringParameters).forEach(([key, values]) => {
+			let k;
+			if ((k = key.match(/^ctx[_-](.*)$/))) {
+
+				let type = event.multiValueQueryStringParameters["t_" + key];
+				let converter = typeConverters[type];
+				if (converter) {
+					values = values.map(v => converter(v));
+				}
+				context[k[1]] = values;
+			}
+		});
+	}
 	//delete body._context;
 	return context;
 }
@@ -294,7 +307,8 @@ module.exports = {
 				context: Object.assign(passedContext, {
 					key: id.identity.caller
 				}),
-				identities: ["role/aws_key"]
+				//prepend possible other passed in identities
+				identities: (Array.isArray(passedContext.identities) ? passedContext.identities.concat(["role/aws_key"]) : ["role/aws_key"])
 			});
 		} else {
 			if (id && id.identity) {
