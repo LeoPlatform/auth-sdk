@@ -228,6 +228,67 @@ describe('index', function () {
 				assert.deepEqual(user.identities, ["awesome-again"]);
 				assert.deepEqual(user.identity_id, "cognitoId-1234");
 			});
+
+			it("get user - custom querystring context with types", async () => {
+
+				let sdk = require("..");
+				let user = await sdk.getUser({
+					queryStringParameters: {
+						ctx_account: "98765",
+						"ctx-value": 3453,
+						ctx_account_id: "12345678910",
+						t_ctx_account_id: "int",
+						ctx_float_value: "1.23456789",
+						t_ctx_float_value: "number",
+						ctx_boolean_value: "true",
+						t_ctx_boolean_value: "boolean",
+						ctx_boolean_value_false: "false",
+						t_ctx_boolean_value_false: "boolean",
+						ctx_invalid_type: "test123",
+						t_ctx_invalid_type: "scalar",
+					},
+					requestContext: {
+						identity: {
+							caller: "identity-1234"
+						}
+					}
+				});
+		
+				assert.deepEqual(user.context, { key: "identity-1234", account: "98765", value: 3453, account_id: 12345678910, float_value: 1.23456789, boolean_value: true, boolean_value_false: false, invalid_type: "test123" });
+			});
+
+			it("get user - custom multiValueQueryStringParameters with types", async() => {
+				let sdk = require("..");
+				let user = await sdk.getUser({
+					multiValueQueryStringParameters: {
+						ctx_array: ["1", "2"],
+						t_ctx_array: "int",
+						ctx_array_invalid: ["test123", "test456"],
+						t_ctx_array_invalid: "scalar"
+					},
+					requestContext: {
+						identity: {
+							caller: "identity-1234"
+						}
+					}
+				});
+				assert.deepEqual(user.context, { key: "identity-1234", array: [1, 2], array_invalid: ["test123", "test456"] });
+			});
+
+			it("get user - custom identities", async() => {
+				let sdk = require("..");
+				let user = await sdk.getUser({
+					requestContext: {
+						identity: {
+							caller: "identity-1234"
+						}
+					},
+					multiValueQueryStringParameters: {
+						ctx_identities: ["role/test2", "role/test3"]
+					}
+				});
+				assert.deepEqual(user.identities, [ "role/test2", "role/test3", "role/aws_key" ]);
+			});
 		});
 
 		describe("auth user", () => {
