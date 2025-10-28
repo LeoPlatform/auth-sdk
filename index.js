@@ -239,13 +239,20 @@ function getPassedContext(event, body) {
 			let k;
 			if ((k = key.match(/^ctx[_-](.*)$/))) {
 
-				// Check for any type conversions on the query parameter
-				let type = event.queryStringParameters["t_" + key];
-				let converter = typeConverters[type];
-				if (converter) {
-					value = converter(value);					
+				// if the key is just `ctx_` or `ctx-` and there is a value, parse it as JSON
+				if (!k[1] && value) {
+					ctx[key] = JSON.parse(value);
+				} else {
+					// Check for any type conversions on the query parameter
+					let type = event.queryStringParameters["t_" + key];
+					let converter = typeConverters[type];
+					if (converter) {
+						value = converter(value);					
+					}
+					ctx[k[1]] = value;
+
 				}
-				ctx[k[1]] = value;
+
 			}
 			return ctx;
 		},

@@ -289,6 +289,20 @@ describe('index', function () {
 				});
 				assert.deepEqual(user.identities, [ "role/test2", "role/test3", "role/aws_key" ]);
 			});
+			it("get user - custom context with JSON value", async() => {
+				let sdk = require("..");
+				let user = await sdk.getUser({
+					queryStringParameters: {
+						ctx_: "{\"test\":\"value\"}"
+					},
+					requestContext: {
+						identity: {
+							caller: "identity-1234"
+						}
+					}
+				});
+				assert.deepEqual(user.context, { key: "identity-1234", ctx_: { test: "value" } });
+			});
 		});
 
 		describe("auth user", () => {
