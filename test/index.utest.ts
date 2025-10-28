@@ -293,7 +293,33 @@ describe('index', function () {
 				let sdk = require("..");
 				let user = await sdk.getUser({
 					queryStringParameters: {
-						ctx_: "{\"test\":\"value\"}"
+						ctx_: JSON.stringify({
+							string: "value",
+							number: 42,
+							float: 3.14159,
+							boolean_true: true,
+							boolean_false: false,
+							null_value: null,
+							object: {
+								nested_string: "nested",
+								nested_number: -99,
+								nested_array: [1, 2, { deep: "object" }],
+								nested_object: {
+									another_level: {
+										foo: "bar"
+									}
+								}
+							},
+							array: [
+								"item1",
+								123,
+								false,
+								{ arr_nested: [1, 2, 3], arr_obj: { a: 1, b: 2 }},
+								[["deep", "array"], [true, null]]
+							],
+							empty_object: {},
+							undefined_value: undefined // undefined will be omitted by JSON.stringify
+						})
 					},
 					requestContext: {
 						identity: {
@@ -301,7 +327,7 @@ describe('index', function () {
 						}
 					}
 				});
-				assert.deepEqual(user.context, { key: "identity-1234", ctx_: { test: "value" } });
+				assert.deepEqual(user.context, { key: "identity-1234", string: "value", number: 42, float: 3.14159, boolean_true: true, boolean_false: false, null_value: null, object: { nested_string: "nested", nested_number: -99, nested_array: [1, 2, { deep: "object" }], nested_object: { another_level: { foo: "bar" } } }, array: [ "item1", 123, false, { arr_nested: [1, 2, 3], arr_obj: { a: 1, b: 2 } }, [["deep", "array"], [true, null]] ], empty_object: {}});
 			});
 		});
 

@@ -1,6 +1,6 @@
 {
   "name": "leo-auth",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "Auth sdk",
   "homepage": "https://leoplatform.io",
   "main": "index.js",
@@ -8,6 +8,7 @@
     "test": "test"
   },
   "scripts": {
+    "test-all": "npm run compile && npm run coverage-all",
     "tests": "mocha --recursive -w",
     "test": "mocha --recursive -g",
     "coverage-all": "cross-env NODE_ENV=utest node ./node_modules/nyc/bin/nyc.js --all node ./node_modules/mocha/bin/mocha --timeout 5000 \"./{,!(node_modules)/**/}*.utest.js\"",

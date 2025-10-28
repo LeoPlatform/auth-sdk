@@ -241,7 +241,7 @@ function getPassedContext(event, body) {
 
 				// if the key is just `ctx_` or `ctx-` and there is a value, parse it as JSON
 				if (!k[1] && value) {
-					ctx[key] = JSON.parse(value);
+					Object.assign(ctx, JSON.parse(value));
 				} else {
 					// Check for any type conversions on the query parameter
 					let type = event.queryStringParameters["t_" + key];
