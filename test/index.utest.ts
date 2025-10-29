@@ -266,8 +266,8 @@ describe('index', function () {
 							caller: "identity-1234"
 						}
 					},
-					multiValueQueryStringParameters: {
-						ctx_identities: ["role/test2", "role/test3"]
+					queryStringParameters: {
+						ctx_: JSON.stringify({identities: ["role/test2", "role/test3"]})
 					}
 				});
 				assert.deepEqual(user.identities, [ "role/test2", "role/test3", "role/aws_key" ]);
