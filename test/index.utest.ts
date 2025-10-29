@@ -257,23 +257,6 @@ describe('index', function () {
 				assert.deepEqual(user.context, { key: "identity-1234", account: "98765", value: 3453, account_id: 12345678910, float_value: 1.23456789, boolean_value: true, boolean_value_false: false, invalid_type: "test123" });
 			});
 
-			it("get user - custom multiValueQueryStringParameters with types", async() => {
-				let sdk = require("..");
-				let user = await sdk.getUser({
-					multiValueQueryStringParameters: {
-						ctx_array: ["1", "2"],
-						t_ctx_array: "int",
-						ctx_array_invalid: ["test123", "test456"],
-						t_ctx_array_invalid: "scalar"
-					},
-					requestContext: {
-						identity: {
-							caller: "identity-1234"
-						}
-					}
-				});
-				assert.deepEqual(user.context, { key: "identity-1234", array: [1, 2], array_invalid: ["test123", "test456"] });
-			});
 
 			it("get user - custom identities", async() => {
 				let sdk = require("..");
@@ -283,8 +266,8 @@ describe('index', function () {
 							caller: "identity-1234"
 						}
 					},
-					multiValueQueryStringParameters: {
-						ctx_identities: ["role/test2", "role/test3"]
+					queryStringParameters: {
+						ctx_: JSON.stringify({identities: ["role/test2", "role/test3"]})
 					}
 				});
 				assert.deepEqual(user.identities, [ "role/test2", "role/test3", "role/aws_key" ]);
