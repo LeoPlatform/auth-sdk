@@ -259,21 +259,6 @@ function getPassedContext(event, body) {
 		body._context || {}
 	);
 
-	// Multi value query parameters support (arrays) this is the default for HTTP requests to the API Gateway
-	if(event.multiValueQueryStringParameters) { 
-		Object.entries(event.multiValueQueryStringParameters).forEach(([key, values]) => {
-			let k;
-			if ((k = key.match(/^ctx[_-](.*)$/))) {
-
-				let type = event.multiValueQueryStringParameters["t_" + key];
-				let converter = typeConverters[type];
-				if (converter) {
-					values = values.map(v => converter(v));
-				}
-				context[k[1]] = values;
-			}
-		});
-	}
 	//delete body._context;
 	return context;
 }
