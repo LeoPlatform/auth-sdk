@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "auth-sdk"
+  description: "Leo/RStreams authentication SDK for Node.js applications"
+  annotations:
+    github.com/project-slug: LeoPlatform/auth-sdk
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - typescript
+    - auth
+    - sdk
+    - nodejs
+spec:
+  type: library
+  lifecycle: production
+  owner: "cup-shared-services"
