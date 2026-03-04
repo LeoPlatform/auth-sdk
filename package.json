@@ -13,7 +13,8 @@
     "test": "mocha --recursive -g",
     "coverage-all": "cross-env NODE_ENV=utest node ./node_modules/nyc/bin/nyc.js --all node ./node_modules/mocha/bin/mocha --timeout 5000 \"./{,!(node_modules)/**/}*.utest.js\"",
     "compile": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3",
@@ -28,8 +29,11 @@
   "devDependencies": {
     "@types/mocha": "^10.0.4",
     "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
     "chai": "^4.3.10",
     "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "sinon": "^17.0.1",
