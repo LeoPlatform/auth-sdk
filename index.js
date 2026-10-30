@@ -96,7 +96,7 @@ function getDDBClient(configure = {}) {
 						};
 						docClient.batchGet(params, function(err, data) {
 							if (err) {
-								logger.error(err);
+								console.error(err);
 								done(err, items);
 							} else {
 								results = results.concat(data.Responses[table]);
