@@ -14,7 +14,6 @@ if (process.env.AWS_REGION == null) {
 
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocument } = require("@aws-sdk/lib-dynamodb");
-const { NodeHttpHandler } = require('@aws-sdk/node-http-handler');
 const https = require("https");
 const merge = require('lodash.merge');
 
@@ -50,13 +49,13 @@ function getDDBClient(configure = {}) {
 	let docClient = DynamoDBDocument.from(new DynamoDBClient({
 		region: configure.region || (configure.aws && configure.aws.region),
 		maxAttempts: 3,
-		requestHandler: new NodeHttpHandler({
+		requestHandler: {
 			connectionTimeout: parseInt(process.env.DYNAMODB_CONNECT_TIMEOUT_MS, 10) || 2000,
 			requestTimeout: parseInt(process.env.DYNAMODB_TIMEOUT_MS, 10) || 5000,
 			httpsAgent: new https.Agent({
 				ciphers: 'ALL',
 			})
-		}),
+		},
 		credentials: configure.credentials
 	}), {
 		marshallOptions: {
@@ -97,7 +96,7 @@ function getDDBClient(configure = {}) {
 						};
 						docClient.batchGet(params, function(err, data) {
 							if (err) {
-								logger.error(err);
+								console.error(err);
 								done(err, items);
 							} else {
 								results = results.concat(data.Responses[table]);
